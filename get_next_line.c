@@ -1,21 +1,28 @@
 #include "get_next_line.h"
+#include "libft/libft.h"
 
 int get_next_line(int const fd, char **line)
 {
-	ssize_t ret;
-	char *str;
-	char ch[BUFF_SIZE + 1];
+	int ret;
+	int flag = 0;;
+	static char *down;
+	char chr[2];
 
-	if ((ret = read(fd, ch, BUFF_SIZE + 1)) > 0)
+	down = ft_strnew(1);
+	if (*line == NULL || fd < 0)
+		return (-1);
+	while ((ret = read(fd, chr, 1)) > 0)
 	{
-		if ( != '\n')
-		{
-			ch[ret] = '\0';
-			str = ch;
-			printf("%s", str);
-		}
+		flag = 1;
+		if (*chr == '\n')
+			break ;
+		down = ft_strjoin(down, chr);
 	}
-	return (1);
+	if (ret < 0)
+		return (-1);
+	if (ret > 0)
+		*line = down;
+	return (flag);
 }
 
 int main(int argc, char **argv)
@@ -26,7 +33,8 @@ int main(int argc, char **argv)
 	if (argc == 2)
 	{
 		fd = open(argv[1], O_RDONLY);
-		get_next_line(fd, &line);
+		printf("%d\n", get_next_line(fd, &line));
 	}
+	close (fd);
 	return (0);
 }
